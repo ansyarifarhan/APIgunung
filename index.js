@@ -5,7 +5,6 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const cors = require('cors');
 require('dotenv').config();
 
-const sequelize = require('./config/database');
 const authRoutes = require('./routes/authRoutes');
 const gunungRoutes = require('./routes/gunungRoutes');
 
@@ -22,7 +21,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: process.env.NODE_ENV === 'production' } // `true` jika di production (HTTPS)
+  cookie: { secure: process.env.NODE_ENV === 'production' }
 }));
 
 // Inisialisasi Passport
@@ -43,7 +42,6 @@ passport.use(new GoogleStrategy({
     callbackURL: "/auth/google/callback"
   },
   (accessToken, refreshToken, profile, done) => {
-    // Di sini Anda bisa menyimpan data `profile` ke database user jika diperlukan
     return done(null, profile);
   }
 ));
@@ -61,11 +59,7 @@ app.get('/', (req, res) => {
     }
 });
 
-// Sinkronisasi database dan jalankan server
-sequelize.sync().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server berjalan di http://localhost:${PORT}`);
-  });
-}).catch(err => {
-    console.error('Gagal terhubung ke database:', err);
-});
+// Jalankan server
+app.listen(PORT, () => {
+  console.log(`Server berjalan di http://localhost:${PORT}`);
+}); 
